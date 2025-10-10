@@ -7,6 +7,13 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout work repository
+        uses: actions/checkout@v4
+        with:
+          repository: k7t3/widios
+          path: ./widios
+          ssh-key: ${{ secrets.REPO_KEY }}
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -18,12 +25,7 @@ jobs:
 
       - name: Verify Gradle
         run: ./gradlew --version
-
-      - uses: actions/checkout@v4
-        with:
-          repository: k7t3/widios
-          path: ./widios
-          ssh-key: ${{ secrets.REPO_KEY }}
+        working-directory: ./widios
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -42,4 +44,5 @@ jobs:
             gradle-wrapper-${{ runner.os }}-
       
       - name: fetch idiosyncrasy
-        run: ./widios/gradlew :backend-cli:run
+        run: ./gradlew :backend-cli:run
+        working-directory: ./widios
