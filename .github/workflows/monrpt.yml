@@ -1,0 +1,91 @@
+name: monthly report
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # 手動実行を可能にする
+
+permissions:
+  contents: write # レポートをコミット・プッシュするために必要
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Get workflow runs count for this month
+        id: get_count
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          START_DATE=$(date -u +"%Y-%m-01T00:00:00Z")
+          END_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          echo "Fetching workflow runs from $START_DATE to $END_DATE"
+          
+          RESPONSE=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?created=${START_DATE}..${END_DATE}&per_page=100")
+          
+          if [ $? -ne 0 ]; then
+            echo "Error: Failed to fetch workflow runs"
+            COUNT=0
+          else
+            COUNT=$(echo "$RESPONSE" | jq '.total_count // 0' 2>/dev/null || echo 0)
+            if [ -z "$COUNT" ] || [ "$COUNT" = "null" ]; then
+              echo "Warning: Could not parse count from API response"
+              COUNT=0
+            fi
+          fi
+          
+          echo "This month's workflow runs: $COUNT"
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Create report file
+        run: |
+          YEAR_MONTH=$(date -u +"%Y-%m")
+          REPORT_DATE=$(date -u +"%Y-%m-%d")
+          
+          echo "# Monthly Workflow Report - ${YEAR_MONTH}" > report.md
+          echo "" >> report.md
+          echo "## Summary" >> report.md
+          echo "" >> report.md
+          echo "- **Total workflow runs this month**: ${{ steps.get_count.outputs.count }}" >> report.md
+          echo "- **Report period**: ${YEAR_MONTH}-01 to ${REPORT_DATE}" >> report.md
+          echo "" >> report.md
+          echo "---" >> report.md
+          echo "" >> report.md
+          echo "_Generated on ${REPORT_DATE}_" >> report.md
+
+      - name: Commit and push report
+        run: |
+          YEAR_MONTH=$(date -u +"%Y-%m")
+          BRANCH_NAME="monthly-report-${YEAR_MONTH}"
+          
+          # 既存のブランチをチェックアウトするか、新規作成
+          git fetch origin
+          if git rev-parse --verify "origin/${BRANCH_NAME}" >/dev/null 2>&1; then
+            git checkout "${BRANCH_NAME}"
+          else
+            git checkout -b "${BRANCH_NAME}"
+          fi
+          
+          # レポートファイルを追加してコミット
+          git add report.md
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Monthly report for ${YEAR_MONTH}"
+            git push origin "${BRANCH_NAME}"
+            echo "Report pushed to branch: ${BRANCH_NAME}"
+          fi
