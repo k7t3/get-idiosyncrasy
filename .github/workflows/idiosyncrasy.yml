@@ -6,10 +6,6 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
-    env:
-      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-      GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
-      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
       
     steps:
       - name: Checkout work repository
@@ -41,5 +37,13 @@ jobs:
         working-directory: ./widios
       
       - name: run idiosyncrasy
-        run: ./gradlew :backend-cli:run
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          ./gradlew :backend-cli:run \
+            -DYOUTUBE_API_KEY="$YOUTUBE_API_KEY" \
+            -DGOOGLE_CLOUD_PROJECT="$GOOGLE_CLOUD_PROJECT" \
+            -DGOOGLE_APPLICATION_CREDENTIALS_JSON="$GOOGLE_APPLICATION_CREDENTIALS_JSON"
         working-directory: ./widios
