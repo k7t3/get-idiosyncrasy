@@ -29,7 +29,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Cache Gradle dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
@@ -46,10 +46,12 @@ jobs:
           GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DISABLE_TOPICS_DETECTION: ${{ vars.DISABLE_TOPICS_DETECTION }}
         run: |
           ./gradlew :backend-cli:run \
             -DYOUTUBE_API_KEY="$YOUTUBE_API_KEY" \
             -DGOOGLE_CLOUD_PROJECT="$GOOGLE_CLOUD_PROJECT" \
             -DGOOGLE_APPLICATION_CREDENTIALS_JSON="$GOOGLE_APPLICATION_CREDENTIALS_JSON" \
-            -DGEMINI_API_KEY="$GEMINI_API_KEY"
+            -DGEMINI_API_KEY="$GEMINI_API_KEY" \
+            -DDISABLE_TOPICS_DETECTION="$DISABLE_TOPICS_DETECTION"
         working-directory: ./widios
