@@ -27,9 +27,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # 前月の初日
-          START_DATE=$(date -u -v-1m +"%Y-%m-01T00:00:00Z")
+          START_DATE=$(date -u -d "1 month ago" +"%Y-%m-01T00:00:00Z")
           # 前月の末日
-          END_DATE=$(date -u -v-1m +"%Y-%m-t" | xargs -I {} date -u -d "{} 23:59:59" +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -u -v-1m -v+1m -v-1d +"%Y-%m-%dT23:59:59Z")
+          END_DATE=$(date -u -d "1 month ago" +"%Y-%m-01T00:00:00Z" | date -u -f - -d "last day of month" +"%Y-%m-%dT23:59:59Z" 2>/dev/null || date -u -d "1 day ago" +"%Y-%m-%dT23:59:59Z")
           
           echo "Fetching workflow runs from $START_DATE to $END_DATE"
           
@@ -54,8 +54,8 @@ jobs:
 
       - name: Create report file
         run: |
-          YEAR_MONTH=$(date -u -v-1m +"%Y-%m")
-          REPORT_DATE=$(date -u -v-1m -v+1m -v-1d +"%Y-%m-%d")
+          YEAR_MONTH=$(date -u -d "1 month ago" +"%Y-%m")
+          REPORT_DATE=$(date -u -d "1 day ago" +"%Y-%m-%d")
           
           echo "# Monthly Workflow Report - ${YEAR_MONTH}" > report.md
           echo "" >> report.md
@@ -70,7 +70,7 @@ jobs:
 
       - name: Commit and push report
         run: |
-          YEAR_MONTH=$(date -u -v-1m +"%Y-%m")
+          YEAR_MONTH=$(date -u -d "1 month ago" +"%Y-%m")
           BRANCH_NAME="monthly-report-${YEAR_MONTH}"
           
           # 既存のブランチをチェックアウトするか、新規作成
