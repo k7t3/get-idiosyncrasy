@@ -36,6 +36,14 @@ jobs:
           restore-keys: |
             gradle-cache-${{ runner.os }}-
 
+      - name: Cache backend-cli cache
+        uses: actions/cache@v4
+        with:
+          path: ./widios/backend-cli/.cache
+          key: backend-cli-cache-${{ runner.os }}-${{ hashFiles('./widios/backend-cli/**') }}
+          restore-keys: |
+            backend-cli-cache-${{ runner.os }}-
+
       - name: Verify Gradle
         run: ./gradlew --version
         working-directory: ./widios
@@ -45,13 +53,13 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_MODEL_TOKEN: ${{ secrets.GH_MODEL_TOKEN }}
           DISABLE_TOPICS_DETECTION: ${{ vars.DISABLE_TOPICS_DETECTION }}
         run: |
           ./gradlew :backend-cli:run \
             -DYOUTUBE_API_KEY="$YOUTUBE_API_KEY" \
             -DGOOGLE_CLOUD_PROJECT="$GOOGLE_CLOUD_PROJECT" \
             -DGOOGLE_APPLICATION_CREDENTIALS_JSON="$GOOGLE_APPLICATION_CREDENTIALS_JSON" \
-            -DGEMINI_API_KEY="$GEMINI_API_KEY" \
+            -DGH_MODEL_TOKEN="$GH_MODEL_TOKEN" \
             -DDISABLE_TOPICS_DETECTION="$DISABLE_TOPICS_DETECTION"
         working-directory: ./widios
