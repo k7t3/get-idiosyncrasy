@@ -41,7 +41,7 @@ jobs:
         id: backend-cli-cache
         with:
           path: ./widios/backend-cli/.cache
-          key: backend-cli-cache-${{ runner.os }}
+          key: backend-cli-cache-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             backend-cli-cache-${{ runner.os }}-
 
