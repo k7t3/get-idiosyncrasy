@@ -36,11 +36,12 @@ jobs:
           restore-keys: |
             gradle-cache-${{ runner.os }}-
 
-      - name: Cache backend-cli cache
-        uses: actions/cache@v4
+      - name: Restore backend-cli cache
+        uses: actions/cache/restore@v4
+        id: backend-cli-cache
         with:
           path: ./widios/backend-cli/.cache
-          key: backend-cli-cache-${{ runner.os }}-${{ hashFiles('./widios/backend-cli/**') }}
+          key: backend-cli-cache-${{ runner.os }}
           restore-keys: |
             backend-cli-cache-${{ runner.os }}-
 
@@ -63,3 +64,9 @@ jobs:
             -DGH_MODEL_TOKEN="$GH_MODEL_TOKEN" \
             -DDISABLE_TOPICS_DETECTION="$DISABLE_TOPICS_DETECTION"
         working-directory: ./widios
+
+      - name: Save backend-cli cache
+        uses: actions/cache/save@v4
+        with:
+          path: ./widios/backend-cli/.cache
+          key: ${{ steps.backend-cli-cache.outputs.cache-primary-key }}
