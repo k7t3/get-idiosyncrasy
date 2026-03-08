@@ -11,9 +11,10 @@ jobs:
       
     steps:
       - name: Checkout work repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: k7t3/widios
+          ref: twitch-support
           path: ./widios
           ssh-key: ${{ secrets.REPO_KEY }}
 
