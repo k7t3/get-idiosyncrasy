@@ -1,6 +1,8 @@
 name: idiosyncrasy-type-t
 
 on:
+  schedule:
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -14,7 +16,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: k7t3/widios
-          ref: twitch-support
           path: ./widios
           ssh-key: ${{ secrets.REPO_KEY }}
 
