@@ -38,7 +38,7 @@ jobs:
 
       - name: Verify Gradle
         run: ./gradlew --version
-        working-directory: ./widios
+        working-directory: ./widios/backend-cli
       
       - name: run idiosyncrasy
         env:
@@ -50,7 +50,7 @@ jobs:
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
           DISABLE_TOPICS_DETECTION: ${{ vars.DISABLE_TOPICS_DETECTION }}
         run: ./gradlew :backend-cli:run
-        working-directory: ./widios
+        working-directory: ./widios/backend-cli
 
       - name: Save backend-cli cache
         uses: actions/cache/save@v4

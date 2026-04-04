@@ -26,3 +26,6 @@ ehthumbs.db
 # Vim swap files
 *.swp
 *.swo
+
+# Agents
+.agents
