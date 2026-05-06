@@ -1,4 +1,4 @@
-name: twitter-collector
+name: idiosyncrasy-collect-x
 
 on:
   # schedule:
