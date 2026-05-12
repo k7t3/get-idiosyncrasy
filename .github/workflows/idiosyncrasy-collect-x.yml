@@ -21,12 +21,12 @@ jobs:
           ssh-key: ${{ secrets.REPO_KEY }}
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
       - name: Restore scweet state cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         id: scweet-cache
         with:
           path: ./widios/twitter-collector/scweet_state.db
@@ -49,7 +49,7 @@ jobs:
 
       - name: Save scweet state cache
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ./widios/twitter-collector/scweet_state.db
           key: ${{ steps.scweet-cache.outputs.cache-primary-key }}
