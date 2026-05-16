@@ -29,14 +29,28 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
 
+      - name: Get widios commit hash
+        id: widios-commit
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        working-directory: ./widios
+
       - name: Restore backend-cli cache
         uses: actions/cache/restore@v5
         id: backend-cli-cache
         with:
           path: ./widios/backend-cli/.cache
-          key: backend-cli-cache-${{ runner.os }}-${{ github.run_id }}
+          key: backend-cli-cache-${{ runner.os }}
           restore-keys: |
             backend-cli-cache-${{ runner.os }}-
+
+      - name: Restore backend-cli build cache
+        uses: actions/cache/restore@v5
+        id: backend-cli-build-cache
+        with:
+          path: ./widios/backend-cli/build
+          key: backend-cli-build-cache-${{ runner.os }}-${{ steps.widios-commit.outputs.sha }}
+          restore-keys: |
+            backend-cli-build-cache-${{ runner.os }}-
 
       - name: Verify Gradle
         run: ./gradlew --version
@@ -51,7 +65,7 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
           DISABLE_TOPICS_DETECTION: ${{ vars.DISABLE_TOPICS_DETECTION }}
-        run: ./gradlew run
+        run: ./gradlew run --no-daemon
         working-directory: ./widios/backend-cli
 
       - name: Save backend-cli cache
@@ -59,3 +73,9 @@ jobs:
         with:
           path: ./widios/backend-cli/.cache
           key: ${{ steps.backend-cli-cache.outputs.cache-primary-key }}
+
+      - name: Save backend-cli build cache
+        uses: actions/cache/save@v5
+        with:
+          path: ./widios/backend-cli/build
+          key: ${{ steps.backend-cli-build-cache.outputs.cache-primary-key }}
