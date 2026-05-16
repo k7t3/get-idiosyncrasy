@@ -8,6 +8,9 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
     environment:
       name: idiosyncrasy
       
@@ -39,7 +42,7 @@ jobs:
         id: backend-cli-cache
         with:
           path: ./widios/backend-cli/.cache
-          key: backend-cli-cache-${{ runner.os }}
+          key: backend-cli-cache-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             backend-cli-cache-${{ runner.os }}-
 
@@ -47,10 +50,10 @@ jobs:
         uses: actions/cache/restore@v5
         id: backend-cli-build-cache
         with:
-          path: ./widios/backend-cli/build
+          path: |
+            ./widios/backend-cli/build/classes
+            ./widios/backend-cli/build/generated
           key: backend-cli-build-cache-${{ runner.os }}-${{ steps.widios-commit.outputs.sha }}
-          restore-keys: |
-            backend-cli-build-cache-${{ runner.os }}-
 
       - name: Verify Gradle
         run: ./gradlew --version
@@ -69,6 +72,7 @@ jobs:
         working-directory: ./widios/backend-cli
 
       - name: Save backend-cli cache
+        if: always()
         uses: actions/cache/save@v5
         with:
           path: ./widios/backend-cli/.cache
@@ -77,5 +81,7 @@ jobs:
       - name: Save backend-cli build cache
         uses: actions/cache/save@v5
         with:
-          path: ./widios/backend-cli/build
+          path: |
+            ./widios/backend-cli/build/classes
+            ./widios/backend-cli/build/generated
           key: ${{ steps.backend-cli-build-cache.outputs.cache-primary-key }}
