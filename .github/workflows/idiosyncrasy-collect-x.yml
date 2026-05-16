@@ -1,8 +1,8 @@
 name: idiosyncrasy-collect-x
 
 on:
-  # schedule:
-  #   - cron: '*/30 * * * *'
+  schedule:
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,6 @@ jobs:
         with:
           repository: k7t3/widios
           path: ./widios
-          ref: x
           ssh-key: ${{ secrets.REPO_KEY }}
 
       - name: Set up Python 3.12
