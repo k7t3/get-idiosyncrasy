@@ -50,9 +50,7 @@ jobs:
         uses: actions/cache/restore@v5
         id: backend-cli-build-cache
         with:
-          path: |
-            ./widios/backend-cli/build/classes
-            ./widios/backend-cli/build/generated
+          path: ./widios/backend-cli/build
           key: backend-cli-build-cache-${{ runner.os }}-${{ steps.widios-commit.outputs.sha }}
 
       - name: Verify Gradle
@@ -81,7 +79,5 @@ jobs:
       - name: Save backend-cli build cache
         uses: actions/cache/save@v5
         with:
-          path: |
-            ./widios/backend-cli/build/classes
-            ./widios/backend-cli/build/generated
+          path: ./widios/backend-cli/build
           key: ${{ steps.backend-cli-build-cache.outputs.cache-primary-key }}
