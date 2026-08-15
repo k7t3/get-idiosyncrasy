@@ -2,12 +2,21 @@ name: idiosyncrasy-type-x
 
 on:
   workflow_dispatch:
+    inputs:
+      collection_mode:
+        description: '収集モード（live: 配信状態のみ、full: 全データ）'
+        required: true
+        default: full
+        type: choice
+        options:
+          - live
+          - full
 
 jobs:
   main:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.workflow }}
+      group: ${{ github.workflow }}-${{ inputs.collection_mode }}
       cancel-in-progress: false
     environment:
       name: idiosyncrasy
@@ -54,7 +63,7 @@ jobs:
         run: ./gradlew --version
         working-directory: ./widios/backend-cli
       
-      - name: run idiosyncrasy
+      - name: Run idiosyncrasy (${{ inputs.collection_mode }})
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
@@ -66,7 +75,7 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
           DISABLE_TOPICS_DETECTION: ${{ vars.DISABLE_TOPICS_DETECTION }}
-        run: ./gradlew run --no-daemon
+        run: ./gradlew run --no-daemon --args="--mode=${{ inputs.collection_mode }}"
         working-directory: ./widios/backend-cli
 
       - name: Save backend-cli cache
