@@ -26,6 +26,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: k7t3/widios
+          ref: main
           path: ./widios
           ssh-key: ${{ secrets.REPO_KEY }}
 
@@ -40,7 +41,15 @@ jobs:
 
       - name: Get widios commit hash
         id: widios-commit
-        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        run: |
+          sha=$(git rev-parse HEAD)
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "widios_ref=main widios_sha=$sha"
+          {
+            echo "### widios execution source"
+            echo "- ref: \`main\`"
+            echo "- commit: \`$sha\`"
+          } >> "$GITHUB_STEP_SUMMARY"
         working-directory: ./widios
 
       - name: Restore backend-cli cache
