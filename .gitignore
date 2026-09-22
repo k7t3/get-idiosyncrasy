@@ -30,3 +30,7 @@ ehthumbs.db
 # Agents
 .agents
 AGENTS.md
+
+# Documentation
+*.md
+!README.md
