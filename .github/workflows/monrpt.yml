@@ -82,7 +82,7 @@ jobs:
           fi
           
           # レポートファイルを追加してコミット
-          git add report.md
+          git add -f report.md
           
           if git diff --staged --quiet; then
             echo "No changes to commit"
